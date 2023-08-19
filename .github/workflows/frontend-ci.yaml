@@ -8,6 +8,9 @@ on:
       - main
   workflow_dispatch:
 
+env: 
+  FRONTEND_PATH: 'starter/frontend'
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -25,14 +28,14 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
       - name: Run lint
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm run lint
 
   test:
@@ -44,18 +47,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: 18 # Use Node.js 18
 
-      - name: Restore cache
+      - name: Cache Node Modules
         uses: actions/cache@v2
         with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
-      - name: Run tests
+      - name: Run test
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm run test
 
   build:
@@ -74,11 +80,14 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v2
         with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
       - name: Build application
-        run: npm build
+        working-directory: ${{ env.FRONTEND_PATH }}
+        run: npm run build
