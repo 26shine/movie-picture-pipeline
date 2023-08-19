@@ -1,9 +1,12 @@
 name: Frontend CI
 
+env: 
+  FRONTEND_PATH: 'starter/frontend'
+
 on:
   pull_request:
       paths:
-      - 'starter/frontend/**'
+      - '${{ env.FRONTEND_PATH }}/**'
       branches:
       - main
   workflow_dispatch:
@@ -25,14 +28,14 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
       - name: Run lint
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm run lint
 
   test:
@@ -51,14 +54,14 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
       - name: Run test
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm run test
 
   build:
@@ -79,12 +82,12 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
 
       - name: Install dependencies
-        working-directory: starter/frontend
+        working-directory: ${{ env.FRONTEND_PATH }}
         run: npm ci
 
       - name: Build application
-        working-directory: starter/frontend
-        run: npm build
+        working-directory: ${{ env.FRONTEND_PATH }}
+        run: npm run build
