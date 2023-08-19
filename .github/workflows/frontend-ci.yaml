@@ -1,15 +1,15 @@
 name: Frontend CI
 
-env: 
-  FRONTEND_PATH: 'starter/frontend'
-
 on:
   pull_request:
       paths:
-      - '${{ env.FRONTEND_PATH }}/**'
+      - 'starter/frontend/**'
       branches:
       - main
   workflow_dispatch:
+
+env: 
+  FRONTEND_PATH: 'starter/frontend'
 
 jobs:
   lint:
