@@ -1,0 +1,66 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'starter/backend/**'
+    branches:
+      - main
+
+env: 
+  BACKEND_PATH: 'starter/backend'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install Pipenv
+      run: python -m pip install pipenv
+
+    - name: Install dependencies
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: pipenv install
+
+    - name: Run lint
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: pipenv run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install Pipenv
+      run: python -m pip install pipenv
+
+    - name: Install dependencies
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: pipenv install
+
+    - name: Run test
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: pipenv run test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Run docker build
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: docker build --tag backend:${{ steps.git_sha.outputs.sha }}
