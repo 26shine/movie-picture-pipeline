@@ -44,9 +44,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: 18 # Use Node.js 18
 
-      - name: Restore cache
+      - name: Cache Node Modules
         uses: actions/cache@v2
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
@@ -54,9 +54,11 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: starter/frontend
         run: npm ci
 
-      - name: Run tests
+      - name: Run test
+        working-directory: starter/frontend
         run: npm run test
 
   build:
@@ -80,7 +82,9 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('starter/frontend/package-lock.json') }}
 
       - name: Install dependencies
+        working-directory: starter/frontend
         run: npm ci
 
       - name: Build application
+        working-directory: starter/frontend
         run: npm build
