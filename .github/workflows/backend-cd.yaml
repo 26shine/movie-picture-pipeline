@@ -65,6 +65,7 @@ jobs:
         mask-password: 'true'
 
     - name: Build, tag, and push docker image to Amazon ECR
+      working-directory: ${{ env.BACKEND_PATH }}
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPOSITORY: backend
