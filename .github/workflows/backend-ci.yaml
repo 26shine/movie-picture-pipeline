@@ -6,6 +6,7 @@ on:
       - 'starter/backend/**'
     branches:
       - main
+  workflow_dispatch:
 
 env: 
   BACKEND_PATH: 'starter/backend'
