@@ -51,31 +51,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: AWS ECR Login
-      if: success()
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:  ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Get Git SHA
-      id: git_sha
-      run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
 
-    - name: Build Docker Image
-      if: success()
-      working-directory: ${{ env.BACKEND_PATH }}
+    - name: Build, tag, and push docker image to Amazon ECR
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: my-ecr-repo
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build the Docker image here using the Dockerfile
-        docker build --tag backend:${{ steps.git_sha.outputs.sha }} .
-
-    - name: Push Docker Image to ECR
-      if: success()
-      working-directory: ${{ env.BACKEND_PATH }}
-      run: |
-        # Tag the Docker image
-        docker tag backend:${{ steps.git_sha.outputs.sha }} ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }}
-
-        # Push the Docker image to ECR
-        docker push ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }}
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
