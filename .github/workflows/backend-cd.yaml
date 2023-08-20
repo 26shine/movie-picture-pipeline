@@ -14,8 +14,7 @@ env:
   ECR_REPO_URI: '540700646425.dkr.ecr.us-east-1.amazonaws.com/backend'
 
 jobs:
-  
-  build-test-deploy:
+  test:
     runs-on: ubuntu-latest
     
     steps:
