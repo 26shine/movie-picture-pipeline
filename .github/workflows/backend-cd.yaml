@@ -1,0 +1,83 @@
+name: Backend Continuous Deployment
+
+on:
+  push:
+    paths:
+      - 'starter/backend/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+env: 
+  FRONTEND_PATH: 'starter/backend'
+  AWS_REGION: 'us-east-1'
+  ECR_REPO_URI: '540700646425.dkr.ecr.us-east-1.amazonaws.com/backend'
+
+jobs:
+  
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install Pipenv
+        run: python -m pip install pipenv
+
+      - name: Install flake8
+        run: python -m pip install flake8
+
+      - name: Install dependencies
+        working-directory: ${{ env.BACKEND_PATH }}
+        run: pipenv install
+
+      - name: Run lint
+        working-directory: ${{ env.BACKEND_PATH }}
+        run: pipenv run lint
+
+      - name: Run test
+        working-directory: ${{ env.BACKEND_PATH }}
+        run: pipenv run test
+
+  build-and-push:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: AWS ECR Login
+      if: success()
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Get Git SHA
+      id: git_sha
+      run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+
+    - name: Build Docker Image
+      if: success()
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: |
+        # Build the Docker image here using the Dockerfile
+        docker build --tag backend:${{ steps.git_sha.outputs.sha }} .
+
+    - name: Push Docker Image to ECR
+      if: success()
+      working-directory: ${{ env.BACKEND_PATH }}
+      run: |
+        # Tag the Docker image
+        docker tag frontend:${{ steps.git_sha.outputs.sha }} ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }
+
+        # Push the Docker image to ECR
+        docker push ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }
