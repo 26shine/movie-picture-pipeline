@@ -77,7 +77,7 @@ jobs:
       working-directory: ${{ env.BACKEND_PATH }}
       run: |
         # Tag the Docker image
-        docker tag frontend:${{ steps.git_sha.outputs.sha }} ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }
+        docker tag backend:${{ steps.git_sha.outputs.sha }} ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }}
 
         # Push the Docker image to ECR
-        docker push ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }
+        docker push ${{ env.ECR_REPO_URI }}:${{ steps.git_sha.outputs.sha }}
