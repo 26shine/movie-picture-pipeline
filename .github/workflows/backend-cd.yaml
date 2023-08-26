@@ -52,8 +52,7 @@ jobs:
     - name: set SHORT_GITHUB_SHA
       run: echo "SHORT_GITHUB_SHA=${GITHUB_SHA::7}"
 
-    - name: Build and upload to ECR
-      uses: .github/actions/build-and-upload-ecr
+    - uses: .github/actions/build-and-upload-ecr
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
