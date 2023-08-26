@@ -49,8 +49,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: set SHORT_GITHUB_SHA
-      run: echo "SHORT_GITHUB_SHA=${GITHUB_SHA::7}"
+    - name: Set Image Tag
+      run: echo "SHORT_GITHUB_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)"  # Extract first 7 characters
+      id: set-image-tag
 
     - name: Build and upload to ECR
       uses: ./.github/actions/build-and-upload-ecr
@@ -60,4 +61,4 @@ jobs:
         aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
         working_directory: ${{ env.WORKING_DIRECTORY }}
         ecr_repository: backend
-        image_tag: $SHORT_GITHUB_SHA
+        image_tag: ${{ steps.set-image-tag.outputs.SHORT_GITHUB_SHA }}
