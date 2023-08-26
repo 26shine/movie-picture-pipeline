@@ -1,0 +1,76 @@
+name: "Build and upload to ECR"
+description: "Build a docker image and upload to ECR"
+
+inputs:
+    working_directory:
+      description: "Path of project"
+      required: true
+    aws_access_key_id:
+      description: "AWS_ACCESS_KEY_ID"
+      required: true
+    aws_secret_access_key:
+      description: "AWS_SECRET_ACCESS_KEY"
+      required: true
+    aws_access_token:
+      description: "AWS_ACCESS_TOKEN"
+      required: false
+    aws_region:
+      description: "AWS Region default to us-east-1"
+      default: "us-east-1"
+      required: false
+    ecr_repository:
+      description: "The name of the repository, for example 'frontend'"
+      required: true
+    image_tag:
+      description: "Image tag for docker"
+      required: true
+
+runs: 
+  using: composite
+  steps:
+    - name: Install yq
+      shell: bash
+      run: |
+        sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.11.2/yq_linux_amd64
+        sudo chmod +x /usr/local/bin/yq
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-access-token: ${{ inputs.aws_access_token }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
+
+    - name: Build and upload image to ECR
+      working-directory: ${{ input.working_directory }}
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ${{ inputs.ecr_repository }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+      shell: bash
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+    
+    - name: Update Deployment Image Tag
+      working-directory: ${{ input.working_directory }}
+      shell: bash
+      env:
+        IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+      run: |
+        echo "Updating k8s/deployment.yaml"
+        yq eval -i 'select (.kind == "Deployment").spec.spec.containers.image = strenv($IMAGE)' ./k8s/deployment.yaml
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v8
+      with:
+        message: "Github action update image tag"
+        default_author: github_actions
+

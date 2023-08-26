@@ -9,8 +9,7 @@ on:
   workflow_dispatch:
 
 env: 
-  BACKEND_PATH: 'starter/backend'
-  AWS_REGION: 'us-east-1'
+  WORKING_DIRECTORY: 'starter/backend'
 
 jobs:
   test:
@@ -32,15 +31,15 @@ jobs:
       run: python -m pip install flake8
 
     - name: Install dependencies
-      working-directory: ${{ env.BACKEND_PATH }}
+      working-directory: $WORKING_DIRECTORY
       run: pipenv install
 
     - name: Run lint
-      working-directory: ${{ env.BACKEND_PATH }}
+      working-directory: $WORKING_DIRECTORY
       run: pipenv run lint
 
     - name: Run test
-      working-directory: ${{ env.BACKEND_PATH }}
+      working-directory: $WORKING_DIRECTORY
       run: pipenv run test
 
   build-and-push:
@@ -50,26 +49,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token:  ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: ${{ env.AWS_REGION }}
+    - name: set SHORT_GITHUB_SHA
+      run: echo "SHORT_GITHUB_SHA=${GITHUB_SHA::7}"
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - uses: ./.github/actions/build-and-upload-ecr
       with:
-        mask-password: 'true'
-
-    - name: Build, tag, and push docker image to Amazon ECR
-      working-directory: ${{ env.BACKEND_PATH }}
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: backend
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+        working_directory: $WORKING_DIRECTORY
+        ecr_repository: backend
+        image_tag: $SHORT_GITHUB_SHA
