@@ -43,7 +43,7 @@ jobs:
       run: pipenv run test
 
   build-and-push:
-    needs: [test]
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -52,7 +52,8 @@ jobs:
     - name: set SHORT_GITHUB_SHA
       run: echo "SHORT_GITHUB_SHA=${GITHUB_SHA::7}"
 
-    - uses: ./.github/actions/build-and-upload-ecr
+    - name: Build and upload to ECR
+      uses: .github/actions/build-and-upload-ecr
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
