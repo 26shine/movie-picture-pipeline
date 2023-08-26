@@ -31,15 +31,15 @@ jobs:
       run: python -m pip install flake8
 
     - name: Install dependencies
-      working-directory: $WORKING_DIRECTORY
+      working-directory: ${{ env.WORKING_DIRECTORY }}
       run: pipenv install
 
     - name: Run lint
-      working-directory: $WORKING_DIRECTORY
+      working-directory: ${{ env.WORKING_DIRECTORY }}
       run: pipenv run lint
 
     - name: Run test
-      working-directory: $WORKING_DIRECTORY
+      working-directory: ${{ env.WORKING_DIRECTORY }}
       run: pipenv run test
 
   build-and-push:
@@ -57,6 +57,6 @@ jobs:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
-        working_directory: $WORKING_DIRECTORY
+        working_directory: ${{ env.WORKING_DIRECTORY }}
         ecr_repository: backend
         image_tag: $SHORT_GITHUB_SHA
