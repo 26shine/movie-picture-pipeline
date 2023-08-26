@@ -60,4 +60,4 @@ jobs:
         aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
         working_directory: ${{ env.WORKING_DIRECTORY }}
         ecr_repository: backend
-        image_tag: ${{ env.WORKING_DIRECTORY }}
+        image_tag: ${{ env.SHORT_GITHUB_SHA }}
