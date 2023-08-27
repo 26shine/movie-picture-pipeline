@@ -48,6 +48,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: set SHORT_GITHUB_SHA
       id: set-short-sha
