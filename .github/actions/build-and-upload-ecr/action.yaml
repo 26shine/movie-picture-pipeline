@@ -66,7 +66,7 @@ runs:
         DEPLOY_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
       run: |
         echo "Updating k8s/deployment.yaml"
-        yq eval -i 'select (.kind == "Deployment").spec.template.spec.containers.image = $DEPLOY_IMAGE' ./k8s/deployment.yaml
+        yq eval -i '.spec.template.spec.containers[0].image = $DEPLOY_IMAGE' ./k8s/deployment.yaml
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v8
