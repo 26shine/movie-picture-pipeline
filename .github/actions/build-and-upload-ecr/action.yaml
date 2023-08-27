@@ -63,10 +63,10 @@ runs:
       working-directory: ${{ inputs.working_directory }}
       shell: bash
       env:
-        IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+        DEPLOY_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
       run: |
         echo "Updating k8s/deployment.yaml"
-        yq eval -i 'select (.kind == "Deployment").spec.spec.containers.image = strenv($IMAGE)' ./k8s/deployment.yaml
+        yq eval -i 'select (.kind == "Deployment").spec.template.spec.containers.image = $DEPLOY_IMAGE' ./k8s/deployment.yaml
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v8
