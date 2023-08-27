@@ -19,3 +19,6 @@ spec:
           image: backend
           ports:
             - containerPort: 5000
+  spec:
+    containers:
+      image: ""
