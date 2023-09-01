@@ -64,3 +64,18 @@ jobs:
         working_directory: ${{ env.WORKING_DIRECTORY }}
         ecr_repository: backend
         image_tag: ${{ steps.set-short-sha.outputs.SHORT_GITHUB_SHA }}
+
+  deploy:
+    needs: [test, build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to EKS
+      uses: ./.github/actions/deploy-to-eks
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+        working_directory: ${{ env.WORKING_DIRECTORY }}

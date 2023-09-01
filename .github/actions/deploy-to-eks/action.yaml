@@ -1,0 +1,45 @@
+name: "Deploy to EKS"
+description: "Deploy to EKS"
+
+inputs:
+    working_directory:
+      description: "Path of project"
+      required: true
+    aws_access_key_id:
+      description: "AWS_ACCESS_KEY_ID"
+      required: true
+    aws_secret_access_key:
+      description: "AWS_SECRET_ACCESS_KEY"
+      required: true
+    aws_access_token:
+      description: "AWS_ACCESS_TOKEN"
+      required: false
+    aws_region:
+      description: "AWS Region default to us-east-1"
+      default: "us-east-1"
+      required: false
+
+runs: 
+  using: composite
+  steps:
+    - name: Install Kubectl - Kustomize
+      shell: bash
+      run: |
+        sudo curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        sudo curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-access-token: ${{ inputs.aws_access_token }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Deploy
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        sudo kustomize build ./k8s  | sudo kubectl apply -k ./k8s
+
