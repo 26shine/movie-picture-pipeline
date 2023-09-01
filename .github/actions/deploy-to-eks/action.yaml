@@ -39,6 +39,7 @@ runs:
         aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
         aws-access-token: ${{ inputs.aws_access_token }}
         aws-region: ${{ inputs.aws_region }}
+        output-credentials: true
 
     - name: Deploy
       shell: bash
