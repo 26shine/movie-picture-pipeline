@@ -32,14 +32,23 @@ runs:
         sudo curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
         sudo mv kustomize /usr/local/bin
 
-    - name: Deploy
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ inputs.aws_access_key_id }}
         aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
         aws-access-token: ${{ inputs.aws_access_token }}
         aws-region: ${{ inputs.aws_region }}
+        role-to-assume: arn:aws:iam::540700646425:role/admin
         output-credentials: true
+
+    - name: Configure Kubectl
+      env:
+        CLUSTER_NAME: ${{ inputs.cluster_name }}
+        AWS_REGION: ${{ inputs.aws_region }}
+      shell: bash
+      run: |
+        sudo aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
     - name: Deploy
       shell: bash

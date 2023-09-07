@@ -9,7 +9,6 @@ spec:
   selector:
     matchLabels:
       app: backend
-  clusterName: cluster
   template:
     metadata:
       labels:
