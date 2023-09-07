@@ -56,11 +56,11 @@ runs:
         AWS_REGION: ${{ inputs.aws_region }}
       shell: bash
       run: |
-        sudo aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
     - name: Deploy
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
-        sudo kustomize build ./k8s  | sudo kubectl apply -k ./k8s
+        kustomize build ./k8s  | kubectl apply -k ./k8s
 
