@@ -31,6 +31,7 @@ runs:
         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
         sudo curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
         sudo mv kustomize /usr/local/bin
+        sudo pip install --upgrade awscli
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v3
@@ -40,6 +41,15 @@ runs:
         aws-access-token: ${{ inputs.aws_access_token }}
         aws-region: ${{ inputs.aws_region }}
         output-credentials: true
+
+    - name: Verify AWS Credentials
+      shell: bash
+      run: |
+        echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
+
+    - name: Debug AWS CLI Configuration
+      shell: bash
+      run: aws configure list
 
     - name: Configure Kubectl
       env:
