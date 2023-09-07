@@ -39,7 +39,6 @@ runs:
         aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
         aws-access-token: ${{ inputs.aws_access_token }}
         aws-region: ${{ inputs.aws_region }}
-        role-to-assume: arn:aws:iam::540700646425:role/admin
         output-credentials: true
 
     - name: Configure Kubectl
