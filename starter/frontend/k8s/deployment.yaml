@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:188276d
+          image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:90488ec
           ports:
             - containerPort: 3000
           envFrom:
@@ -29,3 +29,8 @@ metadata:
   name: frontend-config-map
 data:
   REACT_APP_MOVIE_API_URL: af53e2d7c842146d6bcf5284bf264f66-1921078887.us-east-1.elb.amazonaws.com
+spec:
+  template:
+    spec:
+      containers:
+        - image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:90488ec
