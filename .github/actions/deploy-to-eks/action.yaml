@@ -11,8 +11,8 @@ inputs:
     aws_secret_access_key:
       description: "AWS_SECRET_ACCESS_KEY"
       required: true
-    aws_access_token:
-      description: "AWS_ACCESS_TOKEN"
+    aws_session_token:
+      description: "AWS_SESSION_TOKEN"
       required: false
     aws_region:
       description: "AWS Region default to us-east-1"
@@ -37,7 +37,7 @@ runs:
       with:
         aws-access-key-id: ${{ inputs.aws_access_key_id }}
         aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
-        aws-access-token: ${{ inputs.aws_access_token }}
+        aws-session-token: ${{ inputs.aws_session_token }}
         aws-region: ${{ inputs.aws_region }}
         output-credentials: true
 
