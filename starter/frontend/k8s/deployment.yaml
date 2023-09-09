@@ -22,15 +22,4 @@ spec:
           envFrom:
             - configMapRef:
                 name: frontend-config-map
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: frontend-config-map
-data:
-  REACT_APP_MOVIE_API_URL: af53e2d7c842146d6bcf5284bf264f66-1921078887.us-east-1.elb.amazonaws.com
-spec:
-  template:
-    spec:
-      containers:
-        - image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:90488ec
+

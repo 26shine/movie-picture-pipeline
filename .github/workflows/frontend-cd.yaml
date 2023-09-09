@@ -63,6 +63,7 @@ jobs:
         working_directory: ${{ env.WORKING_DIRECTORY }}
         ecr_repository: frontend
         image_tag: ${{ steps.set-short-sha.outputs.SHORT_GITHUB_SHA }}
+        react_app_movie_api_url: ${{ secrets.REACT_APP_MOVIE_API_URL }}
 
   deploy:
     needs: [test, build-and-push]

@@ -24,6 +24,9 @@ inputs:
     image_tag:
       description: "Image tag for docker"
       required: true
+    react_app_movie_api_url:
+      description: "Api url for frontend"
+      required: false
 
 runs: 
   using: composite
@@ -54,10 +57,18 @@ runs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPOSITORY: ${{ inputs.ecr_repository }}
         IMAGE_TAG: ${{ inputs.image_tag }}
+        REACT_APP_MOVIE_API_URL: ${{ inputs.react_app_movie_api_url }}
       shell: bash
       run: |
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        # Build image
+        if [[ -n "${REACT_APP_MOVIE_API_URL}" ]]; then
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_MOVIE_API_URL=${REACT_APP_MOVIE_API_URL} .
+        else
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        fi
+        # Upload image
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
     
     - name: Update Deployment Image Tag
       working-directory: ${{ inputs.working_directory }}
