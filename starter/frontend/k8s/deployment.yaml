@@ -16,10 +16,9 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:90488ec
+          image: 540700646425.dkr.ecr.us-east-1.amazonaws.com/frontend:3ff6f57
           ports:
             - containerPort: 3000
           envFrom:
             - configMapRef:
                 name: frontend-config-map
-
